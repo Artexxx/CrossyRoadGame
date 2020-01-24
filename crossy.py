@@ -6,17 +6,13 @@ from random import randint
 shelf_size = 100
 
 
-
 class drow(QWidget):
     def paintEvent(self, event):
-        global shelf_number
         painter = QPainter(self)
-        h = self.height()
         w = self.width()
         y = 0
         while y < h:
             y += shelf_size
-            shelf_number+=1
             painter.drawLine(0, y, w, y)
 
 
@@ -24,14 +20,12 @@ class Box(QLabel):
     pass
 
 
-def check_colision(window):
-    hero = window.hero
+def check_colision(hero, monst):
     x_b = hero.x()
     y_b = hero.y()
     x1_b = hero.x() + hero.width()
     y1_b = hero.y() + hero.height()
 
-    monst = window.monst
     x_m = monst.x()
     y_m = monst.y()
     x1_m = monst.x() + monst.width()
@@ -47,6 +41,7 @@ def check_colision(window):
     else:
         monst.setStyleSheet("background-color:  brown")
 
+
 speed = 10
 
 
@@ -61,7 +56,22 @@ def move_hero(window, key):
         hero.move(x, y - shelf_size)
     elif key == Qt.Key_Right:
         hero.move(x + speed, y)
-    check_colision(window)
+
+    for monst in window.monsters:
+        check_colision(hero, monst)
+
+def move_monster(monst, key):
+
+    x = monst.x()
+    y = monst.y()
+    # monst = window.monst
+    speed = monst.speed
+    if key == Qt.Key_Left:
+        monst.move(x - speed, y)
+    elif key == Qt.Key_Right:
+        monst.move(x + speed, y)
+
+
 
 
 class HeroWindow(QMainWindow):
@@ -83,18 +93,30 @@ def make_hero(window):
     HeroWindow.hero = hero
 
 
+def monster_direction_random():
+    if randint(0, 1):
+        return Qt.Key_Left
+    return Qt.Key_Right
+
+
 def make_monster(window):
     monst = Box()
     mnst_size = [randint(3, 10) * 10, randint(1, 10) * 10]
     monst.setFixedSize(mnst_size[0], mnst_size[1])
-
-    monst.move(int((randint(3, 5) * shelf_size - monst.width()) / 2),
-               int((randint(3, 5) * shelf_size - monst.height())))
-    monst.direction = Qt.Key_Up
+    monst.move(int((randint(-3, 15) * shelf_size - monst.width()) / 2),
+               int((randint(-3, 15) * shelf_size - monst.height())))
+    monst.direction = monster_direction_random()
+    monst.speed = randint(15,40)
     monst.setStyleSheet("background-color:  red")
     window.layout().addWidget(monst)
-    window.monst = monst
-    HeroWindow.monst = monst
+    monst.timer = QTimer()
+
+    timer = monst.timer
+    timer.setInterval(266)
+    timer.timeout.connect(lambda: move_monster(monst, monst.direction))
+    timer.start()
+
+    window.monsters.append(monst)
 
 
 root = QApplication([])
@@ -102,15 +124,17 @@ window = HeroWindow()
 window.resize(900, 600)
 window.setStyleSheet("background-color:  #FF9E73")
 
-shelf_number = window.height()//100
+window.monsters = []
+
+shelf_number = window.height() // 100
 
 pole = drow()
+pole.resize(900, 600)
 window.layout().addWidget(pole)
 
 make_hero(window)
 for i in range(15):
     make_monster(window)
-
 
 timer = QTimer()
 timer.timeout.connect(lambda: move_hero(window, HeroWindow.hero.direction))

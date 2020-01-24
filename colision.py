@@ -9,7 +9,7 @@ class Box(QLabel):
 def make_monster(window):
     monst = Box()
     monst.setFixedSize(300, 100)
-    monst.move((window.width()-300)/2, window.height()/2)
+    monst.move((window.width() - 300) / 2, window.height() / 2)
     monst.setStyleSheet("background-color:  brown")
     window.layout().addWidget(monst)
     HeroWindow.monst = monst
@@ -50,9 +50,8 @@ def check_colision(window):
         monst.setStyleSheet("background-color:  brown")
 
 
-speed = 47
 def move_button(window, key):
-    global speed
+    speed = 47
     x = window.hero.x()
     y = window.hero.y()
     hero = window.hero
