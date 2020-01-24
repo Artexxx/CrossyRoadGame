@@ -1,2 +1,1 @@
-# SnaceGame
 # CrossyRoadGame
