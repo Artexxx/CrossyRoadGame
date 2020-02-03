@@ -1,10 +1,11 @@
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QPainter
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QWidget
-from random import randint
+from random import randint, choice
 
 SHELF_SIZE = 100
 SHELF_N = 10
+
 
 class drow(QWidget):
     def paintEvent(self, event):
@@ -12,7 +13,7 @@ class drow(QWidget):
         w = self.width()
         h = self.height()
         y = 0
-        while y < h:
+        while y <= h:
             y += SHELF_SIZE
             painter.drawLine(0, y, w, y)
 
@@ -37,10 +38,7 @@ def check_colision(hero, monst):
     s3 = (x_m > x_b and x_m < x1_b) or (x1_m > x_b and x1_m < x1_b)
     s4 = (y_m > y_b and y_m < y1_b) or (y1_m > y_b and y1_m < y1_b)
 
-    if ((s1 and s2) or (s3 and s4)) or ((s1 and s4) or (s3 and s2)):
-        monst.setStyleSheet("background-color:  red")
-    else:
-        monst.setStyleSheet("background-color:  brown")
+    return ((s1 and s2) or (s3 and s4)) or ((s1 and s4) or (s3 and s2))
 
 
 speed = 10
@@ -58,13 +56,24 @@ def move_hero(window, key):
     elif key == Qt.Key_Right:
         hero.move(x + speed, y)
     elif key == Qt.Key_Down:
-        hero.move(x , y + SHELF_SIZE)
+        hero.move(x, y + SHELF_SIZE)
 
     for monst in window.monsters:
-        check_colision(hero, monst)
+        if check_colision(hero, monst):
+            monst.setStyleSheet("background-color:  red")
+        else:
+            monst.setStyleSheet("background-color:  brown")
+    for tree in window.trees:
+        if check_colision(hero, tree):
+            tree.setStyleSheet("background-color:  red")
+        else:
+            tree.setStyleSheet("background-color:  blue")
+        dict_direction = {Qt.Key_Left: Qt.Key_Right, Qt.Key_Down: Qt.Key_Up, Qt.Key_Right: Qt.Key_Left,
+                          Qt.Key_Up: Qt.Key_Down}
+        move_hero(window, dict_direction[key])
+
 
 def move_monster(monst, key):
-
     x = monst.x()
     y = monst.y()
     # monst = window.monst
@@ -73,8 +82,6 @@ def move_monster(monst, key):
         monst.move(x - speed, y)
     elif key == Qt.Key_Right:
         monst.move(x + speed, y)
-
-
 
 
 class HeroWindow(QMainWindow):
@@ -102,17 +109,19 @@ def monster_direction_random():
 
 
 def make_monster(window):
+    global position_MONSTER
     monst = Box()
     mnst_size = [randint(3, 10) * 10, randint(1, 10) * 10]
     monst.setFixedSize(mnst_size[0], mnst_size[1])
-    monst.move(int((randint(-3, 15) * SHELF_SIZE - monst.width()) / 2),
-               int((randint(-3, 15) * SHELF_SIZE - monst.height())))
+    # monst.move(randint(-3, 15) * SHELF_SIZE ,int(randint(1, 8) * SHELF_SIZE ) - monst.height())   ---Random
+    monst.move(randint(1, 8) * SHELF_SIZE,
+               position_MONSTER.pop(randint(0, len(position_MONSTER) - 1)) * SHELF_SIZE - monst.height())
+
     monst.direction = monster_direction_random()
-    monst.speed = randint(15,40)
-    monst.setStyleSheet("background-color:  red")
+    monst.speed = randint(15, 40)
+    monst.setStyleSheet("background-color:  brown")
     window.layout().addWidget(monst)
     monst.timer = QTimer()
-
     timer = monst.timer
     timer.setInterval(266)
     timer.timeout.connect(lambda: move_monster(monst, monst.direction))
@@ -120,30 +129,35 @@ def make_monster(window):
 
     window.monsters.append(monst)
 
+
 def make_tree(line_coordinate, window):
+    global position_TREE
+
     tree = Box()
     tree.setFixedSize(SHELF_SIZE, SHELF_SIZE)
-
-    tree.move(int(randint(1, 15) * SHELF_SIZE ),line_coordinate )
-    # tree.move(100,line_coordinate )
-
+    tree.move(position_TREE.pop(randint(0, len(position_TREE) - 1)) * SHELF_SIZE, line_coordinate)
     tree.setStyleSheet("background-color:  blue")
     window.layout().addWidget(tree)
     window.tree = tree
+    window.trees.append(tree)
     HeroWindow.tree = tree
+
+
 forest_coordinate = []
+
+
 def make_forest(window):
-    global forest_coordinate
+    global forest_coordinate, position_FOREST
     forest = Box()
     forest.setFixedSize(window.width(), SHELF_SIZE)
-    forest.move(0,int((randint(1, 10) * SHELF_SIZE ) ))
-    print(forest.y())
-    if forest.y() not in forest_coordinate:
-        forest_coordinate.append(forest.y())
+
+    forest.move(0, position_FOREST.pop(randint(0, len(position_FOREST) - 1)) * SHELF_SIZE)
+    # forest.move(0, int((randint(1, 10) * SHELF_SIZE)))
+    forest_coordinate.append(forest.y())
     forest.setStyleSheet("background-color:  green")
     window.layout().addWidget(forest)
-    window.forest = forest
     HeroWindow.forest = forest
+
 
 root = QApplication([])
 window = HeroWindow()
@@ -151,6 +165,7 @@ window.resize(900, 600)
 window.setStyleSheet("background-color:  #FF9E73")
 
 window.monsters = []
+window.trees = []
 
 shelf_number = window.height() // 100
 
@@ -158,20 +173,20 @@ pole = drow()
 pole.resize(900, 600)
 window.layout().addWidget(pole)
 
-
+position_FOREST = [1, 2, 3]
 for i in range(3):
     make_forest(window)
 
-
 print(forest_coordinate)
-for i in range(14):
+position_TREE = [1, 3, 6]
+for i in range(2):
     for crd in forest_coordinate:
-
-        make_tree(crd,window)
+        make_tree(crd, window)
 make_hero(window)
-# for i in range(15):
-#     make_monster(window)
 
+position_MONSTER = [4, 5]
+for i in range(2):
+    make_monster(window)
 
 timer = QTimer()
 timer.timeout.connect(lambda: move_hero(window, HeroWindow.hero.direction))
