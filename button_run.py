@@ -86,6 +86,18 @@ def move_monster(monst, key):
         monst.move(x + speed, y)
 
 
+def transportation(snace, boxes):
+    x = snace.x()
+    y = snace.y()
+    if x < 0:
+        boxes[0].move(x + window.width(), y)
+    elif y < 0:
+        boxes[0].move(x, y + window.height())
+    elif x > window.width():
+        boxes[0].move(0, y)
+    elif y > window.height():
+        boxes[0].move(x, 0)
+
 class HeroWindow(QMainWindow):
     def keyPressEvent(self, event):
         hero = self.hero

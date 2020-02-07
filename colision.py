@@ -8,7 +8,7 @@ class Box(QLabel):
 
 def make_monster(window):
     monst = Box()
-    monst.setFixedSize(300, 100)
+    monst.setFixedSize(200, 100)
     monst.move((window.width() - 300) / 2, window.height() / 2)
     monst.setStyleSheet("background-color:  brown")
     window.layout().addWidget(monst)
@@ -17,7 +17,7 @@ def make_monster(window):
 
 def make_button(window, x, y):
     hero = Box()
-    hero.setFixedSize(200, 100)
+    hero.setFixedSize(100, 100)
     hero.move(x, y)
     hero.direction = Qt.Key_Up
     hero.setStyleSheet("background-color:  black")
@@ -51,7 +51,7 @@ def check_colision(window):
 
 
 def move_button(window, key):
-    speed = 47
+    speed = 100
     x = window.hero.x()
     y = window.hero.y()
     hero = window.hero
@@ -77,7 +77,7 @@ window = HeroWindow()
 window.resize(900, 600)
 window.setStyleSheet("background-color:  #FF9E73")
 
-make_button(window, 300, 310)
+make_button(window, 300, 300)
 make_monster(window)
 
 move_button(window, HeroWindow.hero.direction)
