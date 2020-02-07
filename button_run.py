@@ -130,12 +130,12 @@ def make_monster(window):
     window.monsters.append(monst)
 
 
-def make_tree(line_coordinate, window):
-    global position_TREE
+def make_tree(position_forest, window):
+    global number_TREES
 
     tree = Box()
     tree.setFixedSize(SHELF_SIZE, SHELF_SIZE)
-    tree.move(position_TREE.pop(randint(0, len(position_TREE) - 1)) * SHELF_SIZE, line_coordinate)
+    tree.move(number_TREES.pop(randint(0, len(number_TREES) - 1)) * SHELF_SIZE, position_forest * SHELF_SIZE)
     tree.setStyleSheet("background-color:  blue")
     window.layout().addWidget(tree)
     window.tree = tree
@@ -143,17 +143,11 @@ def make_tree(line_coordinate, window):
     HeroWindow.tree = tree
 
 
-forest_coordinate = []
-
-
-def make_forest(window):
-    global forest_coordinate, position_FOREST
+def make_forest(forest_coordinate, window):
     forest = Box()
     forest.setFixedSize(window.width(), SHELF_SIZE)
-
-    forest.move(0, position_FOREST.pop(randint(0, len(position_FOREST) - 1)) * SHELF_SIZE)
-    # forest.move(0, int((randint(1, 10) * SHELF_SIZE)))
-    forest_coordinate.append(forest.y())
+    # forest.move(0, positions_FOREST.pop(randint(0, len(positions_FOREST) - 1)) * SHELF_SIZE)
+    forest.move(0, forest_coordinate * SHELF_SIZE)
     forest.setStyleSheet("background-color:  green")
     window.layout().addWidget(forest)
     HeroWindow.forest = forest
@@ -173,20 +167,32 @@ pole = drow()
 pole.resize(900, 600)
 window.layout().addWidget(pole)
 
-position_FOREST = [1, 2, 3]
-for i in range(3):
-    make_forest(window)
+# ____________________________________________________________FOREST_________________________________
+DATA_FOREST = {0: [0, 3], 4: [1, 4]}
+positions_FOREST = [key for key in DATA_FOREST.keys()]
 
-print(forest_coordinate)
-position_TREE = [1, 3, 6]
-for i in range(2):
-    for crd in forest_coordinate:
-        make_tree(crd, window)
+for forest_coordinate in positions_FOREST:
+    make_forest(forest_coordinate, window)
+    for i in
+# positions_TREE = DATA_FOREST[forest]
+# print(positions_TREE)
+# while positions_TREE:
+# make_tree(forest, window)
+# ___________________________________________________________________________________________________
+
+
+# position_ROAD = [2,3]
+# for i in range(len(position_ROAD)):
+#    make_road(window)
+
+number_TREES = [1, 6]
+
 make_hero(window)
 
-position_MONSTER = [4, 5]
-for i in range(2):
-    make_monster(window)
+# position_MONSTER = {2:3,4:5}
+# for i in range(len(position_MONSTER)):
+#    for t in range(len(position_MONSTER)):
+#        make_monster(window)
 
 timer = QTimer()
 timer.timeout.connect(lambda: move_hero(window, HeroWindow.hero.direction))
