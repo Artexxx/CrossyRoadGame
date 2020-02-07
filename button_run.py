@@ -68,9 +68,9 @@ def move_hero(window, key):
             tree.setStyleSheet("background-color:  red")
         else:
             tree.setStyleSheet("background-color:  blue")
-        dict_direction = {Qt.Key_Left: Qt.Key_Right, Qt.Key_Down: Qt.Key_Up, Qt.Key_Right: Qt.Key_Left,
-                          Qt.Key_Up: Qt.Key_Down}
-        move_hero(window, dict_direction[key])
+            dict_direction = {Qt.Key_Left: Qt.Key_Right, Qt.Key_Down: Qt.Key_Up, Qt.Key_Right: Qt.Key_Left,
+                              Qt.Key_Up: Qt.Key_Down}
+            # move_hero(window, dict_direction[key])
 
 
 def move_monster(monst, key):
@@ -130,12 +130,12 @@ def make_monster(window):
     window.monsters.append(monst)
 
 
-def make_tree(position_forest, window):
-    global number_TREES
+def make_tree(position_tree, position_forest, window):
 
     tree = Box()
     tree.setFixedSize(SHELF_SIZE, SHELF_SIZE)
-    tree.move(number_TREES.pop(randint(0, len(number_TREES) - 1)) * SHELF_SIZE, position_forest * SHELF_SIZE)
+    # tree.move(number_TREES.pop(randint(0, len(number_TREES) - 1)) * SHELF_SIZE, position_forest * SHELF_SIZE)
+    tree.move(position_tree * SHELF_SIZE, position_forest * SHELF_SIZE)
     tree.setStyleSheet("background-color:  blue")
     window.layout().addWidget(tree)
     window.tree = tree
@@ -168,16 +168,16 @@ pole.resize(900, 600)
 window.layout().addWidget(pole)
 
 # ____________________________________________________________FOREST_________________________________
-DATA_FOREST = {0: [0, 3], 4: [1, 4]}
-positions_FOREST = [key for key in DATA_FOREST.keys()]
+DATA_FOREST = {0: [0, 4, 6], 4: [1, 5]}
 
-for forest_coordinate in positions_FOREST:
+for forest_coordinate in DATA_FOREST.keys():
     make_forest(forest_coordinate, window)
-    for i in
+    for tree_coordinate in DATA_FOREST[forest_coordinate]:
+        make_tree(tree_coordinate, forest_coordinate, window)
+
 # positions_TREE = DATA_FOREST[forest]
 # print(positions_TREE)
 # while positions_TREE:
-# make_tree(forest, window)
 # ___________________________________________________________________________________________________
 
 
