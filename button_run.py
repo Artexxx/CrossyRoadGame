@@ -64,13 +64,15 @@ def move_hero(window, key):
         else:
             monst.setStyleSheet("background-color:  brown")
     for tree in window.trees:
+
         if check_colision(hero, tree):
+            print(tree.x())
             tree.setStyleSheet("background-color:  red")
-        else:
-            tree.setStyleSheet("background-color:  blue")
             dict_direction = {Qt.Key_Left: Qt.Key_Right, Qt.Key_Down: Qt.Key_Up, Qt.Key_Right: Qt.Key_Left,
                               Qt.Key_Up: Qt.Key_Down}
             # move_hero(window, dict_direction[key])
+        else:
+            tree.setStyleSheet("background-color:  blue")
 
 
 def move_monster(monst, key):
@@ -108,22 +110,19 @@ def monster_direction_random():
     return Qt.Key_Right
 
 
-def make_monster(window):
-    global position_MONSTER
+def make_monster(position_road, TYPE_CAR, window):
     monst = Box()
-    mnst_size = [randint(3, 10) * 10, randint(1, 10) * 10]
-    monst.setFixedSize(mnst_size[0], mnst_size[1])
+    monst.setFixedSize(TYPE_CAR["W"] + 5, SHELF_SIZE - 5)
     # monst.move(randint(-3, 15) * SHELF_SIZE ,int(randint(1, 8) * SHELF_SIZE ) - monst.height())   ---Random
-    monst.move(randint(1, 8) * SHELF_SIZE,
-               position_MONSTER.pop(randint(0, len(position_MONSTER) - 1)) * SHELF_SIZE - monst.height())
-
+    # monst.move(randint(1, 8) * SHELF_SIZE,  position_MONSTER.pop(randint(0, len(position_MONSTER) - 1)) * SHELF_SIZE - monst.height())
+    monst.move(position_road * SHELF_SIZE, position_road * SHELF_SIZE)
+    monst.speed = 40
     monst.direction = monster_direction_random()
-    monst.speed = randint(15, 40)
     monst.setStyleSheet("background-color:  brown")
     window.layout().addWidget(monst)
     monst.timer = QTimer()
     timer = monst.timer
-    timer.setInterval(266)
+    timer.setInterval(TYPE_CAR["V"])
     timer.timeout.connect(lambda: move_monster(monst, monst.direction))
     timer.start()
 
@@ -151,6 +150,15 @@ def make_forest(forest_coordinate, window):
     forest.setStyleSheet("background-color:  green")
     window.layout().addWidget(forest)
     HeroWindow.forest = forest
+
+
+def make_road(road_coordinate, window):
+    road = Box()
+    road.setFixedSize(window.width(), SHELF_SIZE)
+    road.move(0, road_coordinate * SHELF_SIZE)
+    road.setStyleSheet("background-color:  #877474")
+    window.layout().addWidget(road)
+    HeroWindow.forest = road
 
 
 root = QApplication([])
@@ -187,12 +195,19 @@ for forest_coordinate in DATA_FOREST.keys():
 
 number_TREES = [1, 6]
 
-make_hero(window)
+# ____________________________________________________________ROAD_________________________________
+car1 = {"V": 266, "W": 100, }
+car2 = {"V": 166, "W": 50, }
 
-# position_MONSTER = {2:3,4:5}
-# for i in range(len(position_MONSTER)):
-#    for t in range(len(position_MONSTER)):
-#        make_monster(window)
+DATA_MONSTERS = {2: [car1], 3: [car2]}
+for position_road in DATA_MONSTERS.keys():
+    make_road(position_road, window)
+
+    for key in DATA_MONSTERS[position_road]:
+        make_monster(position_road, key, window)
+
+
+make_hero(window)
 
 timer = QTimer()
 timer.timeout.connect(lambda: move_hero(window, HeroWindow.hero.direction))
