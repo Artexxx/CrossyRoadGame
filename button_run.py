@@ -21,6 +21,7 @@ class drow(QWidget):
 class Box(QLabel):
     pass
 
+# ____________________________________________________________COLISION_________________________________
 
 def check_colision(hero, car):
     x_b = hero.x()
@@ -36,38 +37,43 @@ def check_colision(hero, car):
     return (x1_b > x_m) and (x_b < x1_m) and (y1_b > y_m) and (y_b < y1_m)
 
 
-speed = 10
+def check_colision_with_car(window):
+    for car in window.cars:
+        transportation(car)
+        if check_colision(window.hero, car):
+            car.setStyleSheet("background-color:  red")
+        else:
+            car.setStyleSheet("background-color:  brown")
+
+
+def check_colision_with_tree(window):
+    for tree in window.trees:
+        if check_colision(window.hero, tree):
+            return True
+
+
+# ______________________________________________________________________________________________________
 
 
 def move_hero(window, key):
-    global speed
+    SPEED = 50
     x = window.hero.x()
     y = window.hero.y()
     hero = window.hero
     if key == Qt.Key_Left:
-        hero.move(x - speed, y)
+        hero.move(x - SPEED, y)
     elif key == Qt.Key_Up:
         hero.move(x, y - SHELF_SIZE)
     elif key == Qt.Key_Right:
-        hero.move(x + speed, y)
+        hero.move(x + SPEED, y)
     elif key == Qt.Key_Down:
         hero.move(x, y + SHELF_SIZE)
 
-    for car in window.cars:
-        transportation(car)
-        if check_colision(hero, car):
-            car.setStyleSheet("background-color:  red")
-        else:
-            car.setStyleSheet("background-color:  brown")
-    for tree in window.trees:
-        if check_colision(hero, tree):
-            print(tree.x())
-            tree.setStyleSheet("background-color:  red")
-            dict_direction = {Qt.Key_Left: Qt.Key_Right, Qt.Key_Down: Qt.Key_Up, Qt.Key_Right: Qt.Key_Left,
-                              Qt.Key_Up: Qt.Key_Down}
-            # move_hero(window, dict_direction[key])
-        else:
-            tree.setStyleSheet("background-color:  blue")
+    check_colision_with_car(window)
+    if check_colision_with_tree(window):
+        dict_direction = {Qt.Key_Left: Qt.Key_Right, Qt.Key_Down: Qt.Key_Up, Qt.Key_Right: Qt.Key_Left,
+                          Qt.Key_Up: Qt.Key_Down}
+        move_hero(window, dict_direction[key])
 
 
 def move_car(car, key):
