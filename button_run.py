@@ -3,7 +3,7 @@ from PyQt5.QtGui import QPainter
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QWidget
 from random import randint, choice
 
-SHELF_SIZE = 100
+SHELF_SIZE = 50
 SHELF_N = 10
 
 
@@ -39,7 +39,6 @@ def check_colision(hero, car):
 
 def check_colision_with_car(window):
     for car in window.cars:
-        transportation(car)
         if check_colision(window.hero, car):
             car.setStyleSheet("background-color:  red")
         else:
@@ -54,9 +53,16 @@ def check_colision_with_tree(window):
 
 # ______________________________________________________________________________________________________
 
+def blocking_hero_movement(hero):
+    x = hero.x()
+    y = hero.y()
+    if (x < 0) or (y < 0) or (x >= window.width()) or (y >= window.height()):
+        return True
+
 
 def move_hero(window, key):
-    SPEED = 50
+    check_colision_with_car(window)
+    SPEED = int(SHELF_SIZE / 2)
     x = window.hero.x()
     y = window.hero.y()
     hero = window.hero
@@ -70,20 +76,10 @@ def move_hero(window, key):
         hero.move(x, y + SHELF_SIZE)
 
     check_colision_with_car(window)
-    if check_colision_with_tree(window):
+    if check_colision_with_tree(window) or blocking_hero_movement(hero):
         dict_direction = {Qt.Key_Left: Qt.Key_Right, Qt.Key_Down: Qt.Key_Up, Qt.Key_Right: Qt.Key_Left,
                           Qt.Key_Up: Qt.Key_Down}
         move_hero(window, dict_direction[key])
-
-
-def move_car(car, key):
-    x = car.x()
-    y = car.y()
-    speed = car.speed
-    if key == Qt.Key_Left:
-        car.move(x - speed, y)
-    elif key == Qt.Key_Right:
-        car.move(x + speed, y)
 
 
 def transportation(car):
@@ -99,6 +95,18 @@ def transportation(car):
         car.move(x, 0)
 
 
+def move_car(car):
+    x = car.x()
+    y = car.y()
+    speed = car.speed
+    if car.direction == Qt.Key_Left:
+        car.move(x - speed, y)
+    elif car.direction == Qt.Key_Right:
+        car.move(x + speed, y)
+    transportation(car)
+    # if check_colision(window.hero, car):
+    #    car.setStyleSheet("background-color:  red")
+
 class HeroWindow(QMainWindow):
     def keyPressEvent(self, event):
         hero = self.hero
@@ -108,33 +116,26 @@ class HeroWindow(QMainWindow):
 
 def make_hero(window):
     hero = Box()
-    hero.setFixedSize(100, 100)
+    hero.setFixedSize(SHELF_SIZE, SHELF_SIZE)
     hero.move(int((window.width() - hero.width()) / 2), int((window.height() - hero.height())))
-    hero.direction = Qt.Key_Up
+    hero.direction = Qt.Key_Down
     hero.setStyleSheet("background-color:  black")
     window.layout().addWidget(hero)
     window.hero = hero
     HeroWindow.hero = hero
 
-
-def car_direction_random():
-    if randint(0, 1):
-        return Qt.Key_Left
-    return Qt.Key_Right
-
-
 def make_car(position_road, TYPE_CAR, window):
     car = Box()
     car.setFixedSize(TYPE_CAR["W"], SHELF_SIZE)
     car.move(position_road * SHELF_SIZE, position_road * SHELF_SIZE)
-    car.speed = 10
-    car.direction = car_direction_random()
+    car.speed = 5
+    car.direction = TYPE_CAR["Direction"]
     car.setStyleSheet("background-color:  brown")
     window.layout().addWidget(car)
     car.timer = QTimer()
     timer = car.timer
     timer.setInterval(TYPE_CAR["V"])
-    timer.timeout.connect(lambda: move_car(car, car.direction))
+    timer.timeout.connect(lambda: move_car(car))
     timer.start()
 
     window.cars.append(car)
@@ -184,7 +185,7 @@ pole.resize(900, 600)
 window.layout().addWidget(pole)
 
 # ____________________________________________________________FOREST_________________________________
-DATA_FOREST = {0: [0, 4, 6], 4: [1, 5]}
+DATA_FOREST = {1: [0, 4, 6], 4: [1, 5], 5: [0, 4, 6], 8: [1, 5], 11: [1, 5], }
 
 for forest_coordinate in DATA_FOREST.keys():
     make_forest(forest_coordinate, window)
@@ -192,8 +193,8 @@ for forest_coordinate in DATA_FOREST.keys():
         make_tree(tree_coordinate, forest_coordinate, window)
 
 # ____________________________________________________________ROAD_________________________________
-car1 = {"V": 166, "W": 100, }
-car2 = {"V": 36, "W": 50, }
+car1 = {"V": 60, "W": 100, "Direction": Qt.Key_Left, }
+car2 = {"V": 15, "W": 50, "Direction": Qt.Key_Left, }
 
 DATA_CARS = {2: [car1], 3: [car2]}
 for position_road in DATA_CARS.keys():
