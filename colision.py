@@ -14,19 +14,25 @@ def make_monster(window):
     window.layout().addWidget(monst)
     HeroWindow.monst = monst
 
-
-def make_button(window, x, y):
-    hero = Box()
-    hero.setFixedSize(100, 100)
-    hero.move(x, y)
-    hero.direction = Qt.Key_Up
-    hero.setStyleSheet("background-color:  black")
-    window.layout().addWidget(hero)
-    window.hero = hero
-    HeroWindow.hero = hero
-
-
 def check_colision(window):
+    hero = window.hero
+    x_b = hero.x()
+    y_b = hero.y()
+    x1_b = hero.x() + hero.width()
+    y1_b = hero.y() + hero.height()
+
+    monst = window.monst
+    x_m = monst.x()
+    y_m = monst.y()
+    x1_m = monst.x() + monst.width()
+    y1_m = monst.y() + monst.height()
+    if (x1_b > x_m) and (x_b < x1_m) and (y1_b > y_m) and (y_b < y1_m):
+        monst.setStyleSheet("background-color:  red")
+    else:
+        monst.setStyleSheet("background-color:  brown")
+
+
+def check_colision2(window):
     hero = window.hero
     x_b = hero.x()
     y_b = hero.y()
@@ -48,6 +54,17 @@ def check_colision(window):
         monst.setStyleSheet("background-color:  red")
     else:
         monst.setStyleSheet("background-color:  brown")
+
+
+def make_button(window, x, y):
+    hero = Box()
+    hero.setFixedSize(100, 100)
+    hero.move(x, y)
+    hero.direction = Qt.Key_Up
+    hero.setStyleSheet("background-color:  black")
+    window.layout().addWidget(hero)
+    window.hero = hero
+    HeroWindow.hero = hero
 
 
 def move_button(window, key):
