@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtGui import QPainter
+from PyQt5.QtGui import QPainter, QColor
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QWidget
 from random import randint, choice
 
@@ -16,6 +16,25 @@ class drow(QWidget):
         while y <= h:
             y += SHELF_SIZE
             painter.drawLine(0, y, w, y)
+
+
+class finish(QWidget):
+
+    def paintEvent(self, event):
+        qp = QPainter(self)
+        col = QColor(200, 0, 0)  # рамка
+        col.setNamedColor('#de2323')
+        qp.setPen(col)
+
+        x = 0
+        y = 0
+        SIZE_RECT = 25
+        while x < window.width():
+            qp.setBrush(QColor(200, 0, 0))
+            qp.drawRect(x, y, SIZE_RECT, SIZE_RECT)
+
+            qp.drawRect(x + SIZE_RECT, y + SIZE_RECT, SIZE_RECT, SIZE_RECT)
+            x += 50
 
 
 class Box(QLabel):
@@ -102,8 +121,6 @@ def move_car(car):
     elif car.direction == Qt.Key_Right:
         car.move(x + speed, y)
     transportation(car)
-    # if check_colision(window.hero, car):
-    #    car.setStyleSheet("background-color:  red")
 
 
 class HeroWindow(QMainWindow):
@@ -145,7 +162,7 @@ def make_tree(position_tree, position_forest, window):
     tree = Box()
     tree.setFixedSize(SHELF_SIZE, SHELF_SIZE)
     tree.move(position_tree * SHELF_SIZE, position_forest * SHELF_SIZE)
-    tree.setStyleSheet("background-color:  blue")
+    tree.setStyleSheet("background-color:  #502D0C")
     window.layout().addWidget(tree)
     window.tree = tree
     window.trees.append(tree)
@@ -169,6 +186,14 @@ def make_road(road_coordinate, window):
     window.layout().addWidget(road)
     HeroWindow.forest = road
 
+
+def make_finish_line(window):
+    finish_line = drow()
+    pole = finish()
+    pole.setFixedSize(window.width(), SHELF_SIZE)
+
+    window.layout().addWidget(pole)
+    window.layout().addWidget(finish_line)
 
 root = QApplication([])
 window = HeroWindow()
@@ -209,7 +234,7 @@ for position_road in DATA_CARS.keys():
     for key in DATA_CARS[position_road]:
         make_car(position_road, key, window)
 # ___________________________________________________________________________________________________
-
+make_finish_line(window)
 
 make_hero(window)
 
