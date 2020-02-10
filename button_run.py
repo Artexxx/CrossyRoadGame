@@ -21,6 +21,7 @@ class drow(QWidget):
 class Box(QLabel):
     pass
 
+
 # ____________________________________________________________COLISION_________________________________
 
 def check_colision(hero, car):
@@ -40,6 +41,7 @@ def check_colision(hero, car):
 def check_colision_with_car(window):
     for car in window.cars:
         if check_colision(window.hero, car):
+            print("HI" * 100)
             car.setStyleSheet("background-color:  red")
         else:
             car.setStyleSheet("background-color:  brown")
@@ -85,14 +87,10 @@ def move_hero(window, key):
 def transportation(car):
     x = car.x()
     y = car.y()
-    if x < 0:
-        car.move(x + window.width(), y)
-    elif y < 0:
-        car.move(x, y + window.height())
-    elif x > window.width():
-        car.move(0, y)
-    elif y > window.height():
-        car.move(x, 0)
+    if x < -car.width():
+        car.move(x + window.width() + car.width(), y)
+    elif x > window.width() + car.width():
+        car.move(-car.width(), y)
 
 
 def move_car(car):
@@ -106,6 +104,7 @@ def move_car(car):
     transportation(car)
     # if check_colision(window.hero, car):
     #    car.setStyleSheet("background-color:  red")
+
 
 class HeroWindow(QMainWindow):
     def keyPressEvent(self, event):
@@ -124,9 +123,10 @@ def make_hero(window):
     window.hero = hero
     HeroWindow.hero = hero
 
+
 def make_car(position_road, TYPE_CAR, window):
     car = Box()
-    car.setFixedSize(TYPE_CAR["W"], SHELF_SIZE)
+    car.setFixedSize(TYPE_CAR["Width"], SHELF_SIZE)
     car.move(position_road * SHELF_SIZE, position_road * SHELF_SIZE)
     car.speed = 5
     car.direction = TYPE_CAR["Direction"]
@@ -163,8 +163,8 @@ def make_forest(forest_coordinate, window):
 
 def make_road(road_coordinate, window):
     road = Box()
-    road.setFixedSize(window.width(), SHELF_SIZE)
-    road.move(0, road_coordinate * SHELF_SIZE)
+    road.setFixedSize(window.width(), SHELF_SIZE - 1)
+    road.move(0, road_coordinate * SHELF_SIZE + 1)
     road.setStyleSheet("background-color:  #877474")
     window.layout().addWidget(road)
     HeroWindow.forest = road
@@ -185,7 +185,11 @@ pole.resize(900, 600)
 window.layout().addWidget(pole)
 
 # ____________________________________________________________FOREST_________________________________
-DATA_FOREST = {1: [0, 4, 6], 4: [1, 5], 5: [0, 4, 6], 8: [1, 5], 11: [1, 5], }
+DATA_FOREST = {1: [i for i in range(0, 18, randint(2, 4))],
+               4: [i for i in range(0, 18, randint(2, 4))],
+               5: [i for i in range(0, 18, randint(2, 4))],
+               8: [i for i in range(0, 18, randint(2, 4))],
+               11: [i for i in range(0, 18, 5)], }
 
 for forest_coordinate in DATA_FOREST.keys():
     make_forest(forest_coordinate, window)
@@ -193,10 +197,12 @@ for forest_coordinate in DATA_FOREST.keys():
         make_tree(tree_coordinate, forest_coordinate, window)
 
 # ____________________________________________________________ROAD_________________________________
-car1 = {"V": 60, "W": 100, "Direction": Qt.Key_Left, }
-car2 = {"V": 15, "W": 50, "Direction": Qt.Key_Left, }
+car1 = {"V": 60, "Width": 100, "Direction": Qt.Key_Left, }
+car2 = {"V": 15, "Width": 50, "Direction": Qt.Key_Left, }
 
-DATA_CARS = {2: [car1], 3: [car2]}
+DATA_CARS = {2: [car1, car1, car1, car1], 3: [car2, car2, car2, car2],
+             6: [car1, car1, car1], 7: [car2, car2, car2, car2],
+             9: [car1, car1, car1, car1], 10: [car2, car2], }
 for position_road in DATA_CARS.keys():
     make_road(position_road, window)
 
