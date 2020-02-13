@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QWidget
 from random import randint, choice
 
 SHELF_SIZE = 50
-SHELF_N = 10
+SHELF_N = 20
 
 
 class drow(QWidget):
@@ -72,6 +72,19 @@ def check_colision_with_tree(window):
             return True
 
 
+# ___________________________________________________________Finish________________________________________
+
+def move_game_window(window):
+    window.move(window.x(), window.y() + 100)
+
+
+def check_finish_line(window):
+    if window.hero.y() < 100:
+        move_game_window(window)
+        return True
+    return False
+
+
 # ______________________________________________________________________________________________________
 
 def blocking_hero_movement(hero):
@@ -97,6 +110,8 @@ def move_hero(window, key):
         hero.move(x, y + SHELF_SIZE)
 
     check_colision_with_car(window)
+    if check_finish_line(window):
+        print("FINISH" * 100)
     if check_colision_with_tree(window) or blocking_hero_movement(hero):
         dict_direction = {Qt.Key_Left: Qt.Key_Right, Qt.Key_Down: Qt.Key_Up, Qt.Key_Right: Qt.Key_Left,
                           Qt.Key_Up: Qt.Key_Down}
@@ -130,21 +145,21 @@ class HeroWindow(QMainWindow):
         hero.direction = key
 
 
-def make_hero(window):
+def make_hero(window, window2):
     hero = Box()
     hero.setFixedSize(SHELF_SIZE, SHELF_SIZE)
     hero.move(int((window.width() - hero.width()) / 2), int((window.height() - hero.height())))
     hero.direction = Qt.Key_Down
     hero.setStyleSheet("background-color:  black")
-    window.layout().addWidget(hero)
+    window2.layout().addWidget(hero)
     window.hero = hero
-    HeroWindow.hero = hero
+    window2.hero = hero
 
 
-def make_car(position_road, TYPE_CAR, window):
+def make_car(position_road, position_car, TYPE_CAR, window):
     car = Box()
     car.setFixedSize(TYPE_CAR["Width"], SHELF_SIZE)
-    car.move(position_road * SHELF_SIZE, position_road * SHELF_SIZE)
+    car.move(position_car * SHELF_SIZE, position_road * SHELF_SIZE)
     car.speed = 5
     car.direction = TYPE_CAR["Direction"]
     car.setStyleSheet("background-color:  brown")
@@ -193,12 +208,18 @@ def make_finish_line(window):
     pole.setFixedSize(window.width(), SHELF_SIZE)
 
     window.layout().addWidget(pole)
-    window.layout().addWidget(finish_line)
 
 root = QApplication([])
-window = HeroWindow()
+window = QMainWindow()
 window.resize(900, 600)
 window.setStyleSheet("background-color:  #FF9E73")
+
+window2 = HeroWindow()
+window2.resize(900, 900)
+window2.move(450, 900)
+window2.setStyleSheet("background-color:  #123E73")
+
+window2.layout().addWidget(window)
 
 window.cars = []
 window.trees = []
@@ -223,24 +244,29 @@ for forest_coordinate in DATA_FOREST.keys():
 
 # ____________________________________________________________ROAD_________________________________
 car1 = {"V": 60, "Width": 100, "Direction": Qt.Key_Left, }
-car2 = {"V": 15, "Width": 50, "Direction": Qt.Key_Left, }
+car2 = {"V": 15, "Width": 50, "Direction": Qt.Key_Right, }
 
 DATA_CARS = {2: [car1, car1, car1, car1], 3: [car2, car2, car2, car2],
              6: [car1, car1, car1], 7: [car2, car2, car2, car2],
              9: [car1, car1, car1, car1], 10: [car2, car2], }
 for position_road in DATA_CARS.keys():
     make_road(position_road, window)
-
-    for key in DATA_CARS[position_road]:
-        make_car(position_road, key, window)
+    position_car = 0
+    n = SHELF_N // len(DATA_CARS[position_road])
+    for k, data_car in enumerate(DATA_CARS[position_road]):
+        position_car += n
+        print(position_car)
+        make_car(position_road, position_car, data_car, window)
 # ___________________________________________________________________________________________________
 make_finish_line(window)
 
-make_hero(window)
+make_hero(window, window2)
 
 timer = QTimer()
-timer.timeout.connect(lambda: move_hero(window, HeroWindow.hero.direction))
+timer.timeout.connect(lambda: move_hero(window, window.hero.direction))
 timer.start(266)
 
-window.show()
+window2.show()
+# window.show()
+
 root.exec()
