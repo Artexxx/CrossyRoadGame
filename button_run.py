@@ -61,12 +61,15 @@ def check_colision_with_car(window):
     for car in window.cars:
         if check_colision(window.hero, car):
             print("HI" * 100)
+            return True
             car.setStyleSheet("background-color:  red")
         else:
             car.setStyleSheet("background-color:  brown")
 
 
 def check_colision_with_tree(window):
+    if window.y() != 0:
+        return False
     for tree in window.trees:
         if check_colision(window.hero, tree):
             return True
@@ -75,11 +78,12 @@ def check_colision_with_tree(window):
 # ___________________________________________________________Finish________________________________________
 
 def move_game_window(window):
-    window.move(window.x(), window.y() + 100)
+    window.move(window.x(), window.y() + 50)
 
 
 def check_finish_line(window):
-    if window.hero.y() < 100:
+    global window2
+    if window.hero.y() < SHELF_SIZE and window.y() != window2.height():
         move_game_window(window)
         return True
     return False
@@ -203,7 +207,6 @@ def make_road(road_coordinate, window):
 
 
 def make_finish_line(window):
-    finish_line = drow()
     pole = finish()
     pole.setFixedSize(window.width(), SHELF_SIZE)
 
@@ -251,9 +254,10 @@ DATA_CARS = {2: [car1, car1, car1, car1], 3: [car2, car2, car2, car2],
              9: [car1, car1, car1, car1], 10: [car2, car2], }
 for position_road in DATA_CARS.keys():
     make_road(position_road, window)
+
     position_car = 0
     n = SHELF_N // len(DATA_CARS[position_road])
-    for k, data_car in enumerate(DATA_CARS[position_road]):
+    for data_car in DATA_CARS[position_road]:
         position_car += n
         print(position_car)
         make_car(position_road, position_car, data_car, window)
