@@ -77,33 +77,45 @@ def check_colision_with_tree(window):
 
 # ___________________________________________________________Finish________________________________________
 
-def move_game_window(window):
-    global base_window, window2
-    if window.y() < base_window.height():
-        window.move(window.x(), window.y() + 10)
-        for car in window.cars:
-            car.timer.stop()
+def move_game_window(window1, window2):
+    global base_window, window
+    for car in window1.cars:
+        car.timer.stop()
+
+    if window1.y() < base_window.height():
+        window1.move(window1.x(), window1.y() + 10)
+        window2.move(window2.x(), window2.y() + 10)
+        window1.hero.move(window1.hero.x(), window1.hero.y() + 10)
+
 
     else:
-
-        window.timer.stop()
-        window.hero.move(int((window.width() - SHELF_SIZE) / 2), int((window.height() - SHELF_SIZE)))
-        window.move(window.x(), -window.y())
-        base_window.hero.timer.stop()
-        base_window.hero.timer = QTimer()
-        timer = base_window.hero.timer
-        timer.timeout.connect(lambda: move_hero(window2, window.hero.direction))
-        timer.start(266)
+        window1.timer.stop()
+        window2.hero = window1.hero
+        window = window2
+    # window.hero.move(int((window.width() - SHELF_SIZE) / 2), int((window.height() - SHELF_SIZE)))
+    # window.move(window.x(), -window.y())
+    # base_window.hero.timer.stop()
+    # base_window.hero.timer = QTimer()
+    # timer = base_window.hero.timer
+    # timer.timeout.connect(lambda: move_hero(window2, window.hero.direction))
+    # timer.start(266)
 
 
 def check_finish_line(window):
-    global window2
+    global base_window
     if window.hero.y() < SHELF_SIZE and window.y() == 0:
+        window2 = QMainWindow()
+        window2.resize(900, 700)
+        window2.setStyleSheet("background-color:  #FF9E73")
+        window2.move(0, -window.height())
+        base_window.layout().addWidget(window2)
+        window.hero.setParent(None)
+        base_window.layout().addWidget(window.hero)
         filling_the_window(window2)
         window.timer = QTimer()
         timer = window.timer
         timer.setInterval(16)
-        timer.timeout.connect(lambda: move_game_window(window))
+        timer.timeout.connect(lambda: move_game_window(window, window2))
         timer.start()
         # window.move(window.width(),0)
 
@@ -117,7 +129,8 @@ def blocking_hero_movement(hero):
         return True
 
 
-def move_hero(window, key):
+def move_hero(key):
+    global window
     check_colision_with_car(window)
     SPEED = int(SHELF_SIZE / 2)
     x = window.hero.x()
@@ -137,7 +150,7 @@ def move_hero(window, key):
     if check_colision_with_tree(window) or blocking_hero_movement(hero):
         dict_direction = {Qt.Key_Left: Qt.Key_Right, Qt.Key_Down: Qt.Key_Up, Qt.Key_Right: Qt.Key_Left,
                           Qt.Key_Up: Qt.Key_Down}
-        move_hero(window, dict_direction[key])
+        move_hero(dict_direction[key])
 
 
 def transportation(car):
@@ -167,7 +180,7 @@ class HeroWindow(QMainWindow):
         hero.direction = key
 
 
-def make_hero(window, window2, base_window):
+def make_hero(window, base_window):
     hero = Box()
     hero.setFixedSize(SHELF_SIZE, SHELF_SIZE)
     hero.move(int((window.width() - hero.width()) / 2), int((window.height() - hero.height())))
@@ -175,7 +188,6 @@ def make_hero(window, window2, base_window):
     hero.setStyleSheet("background-color:  black")
     base_window.layout().addWidget(hero)
     window.hero = hero
-    window2.hero = hero
     base_window.hero = hero
 
 
@@ -271,15 +283,11 @@ window = QMainWindow()
 window.resize(900, 600)
 window.setStyleSheet("background-color:  #FF9E73")
 
-window2 = QMainWindow()
-window2.resize(900, 700)
-window2.setStyleSheet("background-color:  #FF9E73")
 
 base_window = HeroWindow()
 base_window.resize(900, 600)
 
 base_window.setStyleSheet("background-color:  #123E73")
-base_window.layout().addWidget(window2)
 base_window.layout().addWidget(window)
 
 pole = drow()
@@ -287,11 +295,11 @@ pole.resize(900, 600)
 window.layout().addWidget(pole)
 
 filling_the_window(window)
-make_hero(window, window2, base_window)
+make_hero(window, base_window)
 
 base_window.hero.timer = QTimer()
 timer = base_window.hero.timer
-timer.timeout.connect(lambda: move_hero(window, window.hero.direction))
+timer.timeout.connect(lambda: move_hero(window.hero.direction))
 timer.start(266)
 
 base_window.show()
