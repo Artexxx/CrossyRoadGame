@@ -77,13 +77,16 @@ def check_colision_with_tree(window):
 def move_game_window(window):
     global base_window
     if window.y() < base_window.height():
+        window.hero.move(window.x(), window.y() + 10)
         window.move(window.x(), window.y() + 10)
     else:
         window.timer.stop()
 
 
 def check_finish_line(window):
+    global window2
     if window.hero.y() < SHELF_SIZE and window.y() == 0:
+        filling_the_window(window2)
         window.timer = QTimer()
         timer = window.timer
         timer.setInterval(16)
