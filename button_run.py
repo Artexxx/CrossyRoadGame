@@ -61,7 +61,10 @@ def check_colision_with_car(window):
     for car in window.cars:
         if check_colision(window.hero, car):
             print("HI" * 100)
+            car.setStyleSheet("background-color:  red")
             return True
+        else:
+            car.setStyleSheet("background-color:  brown")
 
 
 def check_colision_with_tree(window):
@@ -75,12 +78,22 @@ def check_colision_with_tree(window):
 # ___________________________________________________________Finish________________________________________
 
 def move_game_window(window):
-    global base_window
+    global base_window, window2
     if window.y() < base_window.height():
-        window.hero.move(window.x(), window.y() + 10)
         window.move(window.x(), window.y() + 10)
+        for car in window.cars:
+            car.timer.stop()
+
     else:
+
         window.timer.stop()
+        window.hero.move(int((window.width() - SHELF_SIZE) / 2), int((window.height() - SHELF_SIZE)))
+        window.move(window.x(), -window.y())
+        base_window.hero.timer.stop()
+        base_window.hero.timer = QTimer()
+        timer = base_window.hero.timer
+        timer.timeout.connect(lambda: move_hero(window2, window.hero.direction))
+        timer.start(266)
 
 
 def check_finish_line(window):
@@ -92,6 +105,7 @@ def check_finish_line(window):
         timer.setInterval(16)
         timer.timeout.connect(lambda: move_game_window(window))
         timer.start()
+        # window.move(window.width(),0)
 
 
 # ______________________________________________________________________________________________________
@@ -153,7 +167,7 @@ class HeroWindow(QMainWindow):
         hero.direction = key
 
 
-def make_hero(window, base_window):
+def make_hero(window, window2, base_window):
     hero = Box()
     hero.setFixedSize(SHELF_SIZE, SHELF_SIZE)
     hero.move(int((window.width() - hero.width()) / 2), int((window.height() - hero.height())))
@@ -161,6 +175,7 @@ def make_hero(window, base_window):
     hero.setStyleSheet("background-color:  black")
     base_window.layout().addWidget(hero)
     window.hero = hero
+    window2.hero = hero
     base_window.hero = hero
 
 
@@ -258,12 +273,11 @@ window.setStyleSheet("background-color:  #FF9E73")
 
 window2 = QMainWindow()
 window2.resize(900, 700)
-window2.move(0, 0)
 window2.setStyleSheet("background-color:  #FF9E73")
 
 base_window = HeroWindow()
-base_window.resize(900, 900)
-base_window.move(450, 900)
+base_window.resize(900, 600)
+
 base_window.setStyleSheet("background-color:  #123E73")
 base_window.layout().addWidget(window2)
 base_window.layout().addWidget(window)
@@ -273,13 +287,12 @@ pole.resize(900, 600)
 window.layout().addWidget(pole)
 
 filling_the_window(window)
-make_hero(window, base_window)
+make_hero(window, window2, base_window)
 
-timer = QTimer()
+base_window.hero.timer = QTimer()
+timer = base_window.hero.timer
 timer.timeout.connect(lambda: move_hero(window, window.hero.direction))
 timer.start(266)
 
 base_window.show()
-# window.show()
-
 root.exec()
