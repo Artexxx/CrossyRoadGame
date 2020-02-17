@@ -62,9 +62,6 @@ def check_colision_with_car(window):
         if check_colision(window.hero, car):
             print("HI" * 100)
             return True
-            car.setStyleSheet("background-color:  red")
-        else:
-            car.setStyleSheet("background-color:  brown")
 
 
 def check_colision_with_tree(window):
@@ -78,15 +75,20 @@ def check_colision_with_tree(window):
 # ___________________________________________________________Finish________________________________________
 
 def move_game_window(window):
-    window.move(window.x(), window.y() + 50)
+    global base_window
+    if window.y() < base_window.height():
+        window.move(window.x(), window.y() + 10)
+    else:
+        window.timer.stop()
 
 
 def check_finish_line(window):
-    global window2
-    if window.hero.y() < SHELF_SIZE and window.y() != window2.height():
-        move_game_window(window)
-        return True
-    return False
+    if window.hero.y() < SHELF_SIZE and window.y() == 0:
+        window.timer = QTimer()
+        timer = window.timer
+        timer.setInterval(16)
+        timer.timeout.connect(lambda: move_game_window(window))
+        timer.start()
 
 
 # ______________________________________________________________________________________________________
@@ -114,8 +116,7 @@ def move_hero(window, key):
         hero.move(x, y + SHELF_SIZE)
 
     check_colision_with_car(window)
-    if check_finish_line(window):
-        print("FINISH" * 100)
+    check_finish_line(window)
     if check_colision_with_tree(window) or blocking_hero_movement(hero):
         dict_direction = {Qt.Key_Left: Qt.Key_Right, Qt.Key_Down: Qt.Key_Up, Qt.Key_Right: Qt.Key_Left,
                           Qt.Key_Up: Qt.Key_Down}
@@ -149,15 +150,15 @@ class HeroWindow(QMainWindow):
         hero.direction = key
 
 
-def make_hero(window, window2):
+def make_hero(window, base_window):
     hero = Box()
     hero.setFixedSize(SHELF_SIZE, SHELF_SIZE)
     hero.move(int((window.width() - hero.width()) / 2), int((window.height() - hero.height())))
     hero.direction = Qt.Key_Down
     hero.setStyleSheet("background-color:  black")
-    window2.layout().addWidget(hero)
+    base_window.layout().addWidget(hero)
     window.hero = hero
-    window2.hero = hero
+    base_window.hero = hero
 
 
 def make_car(position_road, position_car, TYPE_CAR, window):
@@ -212,65 +213,70 @@ def make_finish_line(window):
 
     window.layout().addWidget(pole)
 
+
+def filling_the_window(window):
+    window.cars = []
+    window.trees = []
+
+    # ____________________________________________________________FOREST_________________________________
+    DATA_FOREST = {1: [i for i in range(0, 18, randint(2, 4))],
+                   4: [i for i in range(0, 18, randint(2, 4))],
+                   5: [i for i in range(0, 18, randint(2, 4))],
+                   8: [i for i in range(0, 18, randint(2, 4))],
+                   11: [i for i in range(0, 18, 5)], }
+    for forest_coordinate in DATA_FOREST.keys():
+        make_forest(forest_coordinate, window)
+        for tree_coordinate in DATA_FOREST[forest_coordinate]:
+            make_tree(tree_coordinate, forest_coordinate, window)
+
+    # ____________________________________________________________ROAD_________________________________
+    car1 = {"V": 60, "Width": 100, "Direction": Qt.Key_Left, }
+    car2 = {"V": 15, "Width": 50, "Direction": Qt.Key_Right, }
+
+    DATA_CARS = {2: [car1, car1, car1, car1], 3: [car2, car2, car2, car2],
+                 6: [car1, car1, car1], 7: [car2, car2, car2, car2],
+                 9: [car1, car1, car1, car1], 10: [car2, car2], }
+    for position_road in DATA_CARS.keys():
+        make_road(position_road, window)
+
+        position_car = 0
+        n = SHELF_N // len(DATA_CARS[position_road])
+        for data_car in DATA_CARS[position_road]:
+            position_car += n
+            make_car(position_road, position_car, data_car, window)
+    # ___________________________________________________________________________________________________
+    make_finish_line(window)
+
+
 root = QApplication([])
 window = QMainWindow()
 window.resize(900, 600)
 window.setStyleSheet("background-color:  #FF9E73")
 
-window2 = HeroWindow()
-window2.resize(900, 900)
-window2.move(450, 900)
-window2.setStyleSheet("background-color:  #123E73")
+window2 = QMainWindow()
+window2.resize(900, 700)
+window2.move(0, 0)
+window2.setStyleSheet("background-color:  #FF9E73")
 
-window2.layout().addWidget(window)
-
-window.cars = []
-window.trees = []
-
-shelf_number = window.height() // 100
+base_window = HeroWindow()
+base_window.resize(900, 900)
+base_window.move(450, 900)
+base_window.setStyleSheet("background-color:  #123E73")
+base_window.layout().addWidget(window2)
+base_window.layout().addWidget(window)
 
 pole = drow()
 pole.resize(900, 600)
 window.layout().addWidget(pole)
 
-# ____________________________________________________________FOREST_________________________________
-DATA_FOREST = {1: [i for i in range(0, 18, randint(2, 4))],
-               4: [i for i in range(0, 18, randint(2, 4))],
-               5: [i for i in range(0, 18, randint(2, 4))],
-               8: [i for i in range(0, 18, randint(2, 4))],
-               11: [i for i in range(0, 18, 5)], }
-
-for forest_coordinate in DATA_FOREST.keys():
-    make_forest(forest_coordinate, window)
-    for tree_coordinate in DATA_FOREST[forest_coordinate]:
-        make_tree(tree_coordinate, forest_coordinate, window)
-
-# ____________________________________________________________ROAD_________________________________
-car1 = {"V": 60, "Width": 100, "Direction": Qt.Key_Left, }
-car2 = {"V": 15, "Width": 50, "Direction": Qt.Key_Right, }
-
-DATA_CARS = {2: [car1, car1, car1, car1], 3: [car2, car2, car2, car2],
-             6: [car1, car1, car1], 7: [car2, car2, car2, car2],
-             9: [car1, car1, car1, car1], 10: [car2, car2], }
-for position_road in DATA_CARS.keys():
-    make_road(position_road, window)
-
-    position_car = 0
-    n = SHELF_N // len(DATA_CARS[position_road])
-    for data_car in DATA_CARS[position_road]:
-        position_car += n
-        print(position_car)
-        make_car(position_road, position_car, data_car, window)
-# ___________________________________________________________________________________________________
-make_finish_line(window)
-
-make_hero(window, window2)
+filling_the_window(window)
+make_hero(window, base_window)
 
 timer = QTimer()
 timer.timeout.connect(lambda: move_hero(window, window.hero.direction))
 timer.start(266)
 
-window2.show()
+base_window.show()
 # window.show()
 
 root.exec()
