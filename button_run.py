@@ -92,32 +92,31 @@ def move_game_window(window1, window2):
         window1.timer.stop()
         window2.hero = window1.hero
         window = window2
-    # window.hero.move(int((window.width() - SHELF_SIZE) / 2), int((window.height() - SHELF_SIZE)))
-    # window.move(window.x(), -window.y())
-    # base_window.hero.timer.stop()
-    # base_window.hero.timer = QTimer()
-    # timer = base_window.hero.timer
-    # timer.timeout.connect(lambda: move_hero(window2, window.hero.direction))
-    # timer.start(266)
+
+
+def create_window2(base_window):
+    window2 = QMainWindow()
+    window2.resize(900, 600)
+    window2.setStyleSheet("background-color:  #FF9E73")
+    window2.move(0, -window.height())
+    base_window.layout().addWidget(window2)
+    return window2
 
 
 def check_finish_line(window):
     global base_window
     if window.hero.y() < SHELF_SIZE and window.y() == 0:
-        window2 = QMainWindow()
-        window2.resize(900, 700)
-        window2.setStyleSheet("background-color:  #FF9E73")
-        window2.move(0, -window.height())
-        base_window.layout().addWidget(window2)
+        window2 = create_window2(base_window)
+
         window.hero.setParent(None)
         base_window.layout().addWidget(window.hero)
+
         filling_the_window(window2)
         window.timer = QTimer()
         timer = window.timer
         timer.setInterval(16)
         timer.timeout.connect(lambda: move_game_window(window, window2))
         timer.start()
-        # window.move(window.width(),0)
 
 
 # ______________________________________________________________________________________________________
@@ -282,7 +281,6 @@ root = QApplication([])
 window = QMainWindow()
 window.resize(900, 600)
 window.setStyleSheet("background-color:  #FF9E73")
-
 
 base_window = HeroWindow()
 base_window.resize(900, 600)
