@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtGui import QPainter, QColor
+from PyQt5.QtGui import QPainter, QColor, QPixmap
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QWidget
 from random import randint, choice
 
@@ -121,6 +121,25 @@ def check_finish_line(window):
 
 # ______________________________________________________________________________________________________
 
+def change_img(hero, index):
+    pixmap = QPixmap(HERO_IMG[index])
+    pixmap = pixmap.scaledToHeight(SHELF_SIZE)
+    hero.setPixmap(pixmap)
+
+
+def put_a_picture_on_hero(hero, key):
+    if key == Qt.Key_Left:
+        change_img(hero, 2)
+    elif key == Qt.Key_Up:
+        change_img(hero, 1)
+    elif key == Qt.Key_Down:
+        change_img(hero, 3)
+    elif key == Qt.Key_Right:
+        change_img(hero, 0)
+
+
+# ______________________________________________________________________________________________________
+
 def blocking_hero_movement(hero):
     x = hero.x()
     y = hero.y()
@@ -143,6 +162,8 @@ def move_hero(key):
         hero.move(x + SPEED, y)
     elif key == Qt.Key_Down:
         hero.move(x, y + SHELF_SIZE)
+
+    put_a_picture_on_hero(hero, key)
 
     check_colision_with_car(window)
     check_finish_line(window)
@@ -281,6 +302,11 @@ root = QApplication([])
 window = QMainWindow()
 window.resize(900, 600)
 window.setStyleSheet("background-color:  #FF9E73")
+
+hero_img_names = ['img/sR.png', 'img/sU.png', 'img/sL.png', 'img/sD.png']
+HERO_IMG = []
+for img_name in hero_img_names:
+    HERO_IMG.append(QPixmap(img_name))
 
 base_window = HeroWindow()
 base_window.resize(900, 600)
