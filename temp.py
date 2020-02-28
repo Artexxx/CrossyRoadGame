@@ -46,7 +46,6 @@ def start_timer_on_hero(hero):
     timer.timeout.connect(lambda: desine(start_x, window.hero))
     timer.start(30)
 
-
 def move_hero(window, key):
     speed = 100
     x = window.hero.x()
