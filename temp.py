@@ -4,6 +4,9 @@ from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel
 
 T = 0
+V = 10
+A = 2
+X_V = 5
 
 
 class Box(QLabel):
@@ -21,27 +24,27 @@ def make_hero(window, x, y):
     HeroWindow.hero = hero
 
 
+def jump_to_right(start_y, hero):
+    global T, V, A
+    Y = -V * T + A * T * T / 2
+    hero.move(hero.x() + X_V, start_y + Y)
+    T = T + 1
+    if hero.y() > start_y:  # or hero.y() == stop_x():
+        T = 0
+        hero.timer = "Stop"
+
+
 def desine(start_y, hero):
     global T
-    V = 10
-    A = 3
-    Y = -V * T + A * T * T / 2
-    hero.move(hero.x(), start_y + Y)
-    T = T + 1
+    jump_to_right(start_y, hero)
 
-    if hero.y() > start_y:
-        T = 0
-        hero.timer.stop()
-    #
-    # if hero.x() <=start_x/2:
-    #
-    #     hero.move(hero.x() + 10, hero.y()+5)
-    # else:
-    #     hero.move(hero.x() + 10, hero.y()-5)
-    #
-    # if hero.x() >= start_x:
-    #     hero.timer.stop()
-    # time.sleep(0.1)
+
+def start_timer_on_hero(hero):
+    window.hero.timer = QTimer()
+    timer = window.hero.timer
+    start_x = window.hero.y()
+    timer.timeout.connect(lambda: desine(start_x, window.hero))
+    timer.start(30)
 
 
 def move_hero(window, key):
@@ -54,12 +57,9 @@ def move_hero(window, key):
     elif key == Qt.Key_Up:
         hero.move(x, y - speed)
     elif key == Qt.Key_Right:
-        start_x = window.hero.y()
-        window.hero.timer = QTimer()
-        timer = window.hero.timer
-        timer.timeout.connect(lambda: desine(start_x, window.hero))
-        timer.start(30)
-
+        window.hero.timer = "Stop"
+        if hero.timer == "Stop":
+            start_timer_on_hero(window.hero)
 
     elif key == Qt.Key_Down:
         hero.move(x, y + speed)
