@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QPainter, QColor, QPixmap
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QWidget
-from random import randint, choice
+from random import randint
 
 SHELF_SIZE = 50
 SHELF_N = 20
