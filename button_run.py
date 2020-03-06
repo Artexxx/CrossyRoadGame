@@ -90,6 +90,10 @@ def move_game_window(window1, window2):
 
     else:
         window1.timer.stop()
+        window1.hero.timer.start()
+
+        window1.hero.move(int((window.width() - window1.hero.width()) / 2),
+                          int((window.height() - window1.hero.height())))
         window2.hero = window1.hero
         window = window2
 
@@ -109,6 +113,7 @@ def check_finish_line(window):
         window2 = create_window2(base_window)
 
         window.hero.setParent(None)
+        window.hero.timer.stop()
         base_window.layout().addWidget(window.hero)
 
         filling_the_window(window2)
