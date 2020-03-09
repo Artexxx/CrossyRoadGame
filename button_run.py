@@ -5,7 +5,6 @@ from random import randint
 
 from hero_jump import jump_to_down, jump_to_left, jump_to_right, jump_to_up
 
-
 SHELF_SIZE = 50
 SHELF_N = 20
 
@@ -60,9 +59,9 @@ def check_colision(hero, car):
     return (x1_b > x_m) and (x_b < x1_m) and (y1_b > y_m) and (y_b < y1_m)
 
 
-def check_colision_with_car(window):
+def check_colision_with_car(window, hero):
     for car in window.cars:
-        if check_colision(window.hero, car):
+        if check_colision(hero, car):
             print("HI" * 100)
             car.setStyleSheet("background-color:  red")
             return True
@@ -70,12 +69,30 @@ def check_colision_with_car(window):
             car.setStyleSheet("background-color:  brown")
 
 
-def check_colision_with_tree(window):
+def check_colision_with_tree(window, hero):
     if window.y() != 0:
         return False
     for tree in window.trees:
-        if check_colision(window.hero, tree):
+        if check_colision(hero, tree):
             return True
+
+
+def check_colisions_all(window, key):
+    f_hero = Box()
+    f_hero.setFixedSize(SHELF_SIZE, SHELF_SIZE)
+    f_hero.x = window.x()
+    f_hero.y = window.y()
+
+    if key == Qt.Key_Left:
+        f_hero.x( -= 25
+        elif key == Qt.Key_Up:
+        f_hero.y += 50
+        elif key == Qt.Key_Right:
+        f_hero.x += 25
+        elif key == Qt.Key_Down:
+        f_hero.y += 50
+    return check_colision_with_tree(window, f_hero) and check_colision_with_car(window, f_hero)
+
 
 
 # ___________________________________________________________Finish________________________________________
@@ -163,12 +180,12 @@ def start_jump_hero(hero, function_direction_jump: 'function'):
         timer.timeout.connect(lambda: function_direction_jump(starting_cordinate_hero, hero))
         timer.start(30)
 
+
 def move_hero(key):
     global window
-    check_colision_with_car(window)
     check_finish_line(window)
 
-    if check_colision_with_tree(window) or blocking_hero_movement(window.hero):
+    if check_colisions_all(window, key):
 
         if key == Qt.Key_Left:
             start_jump_hero(window.hero, jump_to_left)
