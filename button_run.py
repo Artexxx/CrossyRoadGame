@@ -3,6 +3,9 @@ from PyQt5.QtGui import QPainter, QColor, QPixmap
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QWidget
 from random import randint
 
+from hero_jump import jump_to_down, jump_to_left, jump_to_right, jump_to_up
+
+
 SHELF_SIZE = 50
 SHELF_N = 20
 
@@ -152,7 +155,34 @@ def blocking_hero_movement(hero):
         return True
 
 
+def start_jump_hero(hero, function_direction_jump: 'function'):
+    if hero.jump_timer == "Stop":
+        hero.jump_timer = QTimer()
+        timer = window.hero.jump_timer
+        starting_cordinate_hero = [window.hero.y(), window.hero.x()]
+        timer.timeout.connect(lambda: function_direction_jump(starting_cordinate_hero, hero))
+        timer.start(30)
+
 def move_hero(key):
+    global window
+    check_colision_with_car(window)
+    check_finish_line(window)
+
+    if check_colision_with_tree(window) or blocking_hero_movement(window.hero):
+
+        if key == Qt.Key_Left:
+            start_jump_hero(window.hero, jump_to_left)
+        elif key == Qt.Key_Up:
+            start_jump_hero(window.hero, jump_to_up)
+        elif key == Qt.Key_Right:
+            start_jump_hero(window.hero, jump_to_right)
+        elif key == Qt.Key_Down:
+            start_jump_hero(window.hero, jump_to_down)
+
+        put_a_picture_on_hero(window.hero, key)
+
+
+def move2_hero(key):
     global window
     check_colision_with_car(window)
     SPEED = int(SHELF_SIZE / 2)
@@ -209,7 +239,8 @@ def make_hero(window, base_window):
     hero = Box()
     hero.setFixedSize(SHELF_SIZE, SHELF_SIZE)
     hero.move(int((window.width() - hero.width()) / 2), int((window.height() - hero.height())))
-    hero.direction = Qt.Key_Down
+    hero.direction = Qt.Key_Up
+    hero.jump_timer = "Stop"
     hero.setStyleSheet("background-color:  black")
     base_window.layout().addWidget(hero)
     window.hero = hero
@@ -329,7 +360,7 @@ make_hero(window, base_window)
 base_window.hero.timer = QTimer()
 timer = base_window.hero.timer
 timer.timeout.connect(lambda: move_hero(window.hero.direction))
-timer.start(266)
+timer.start(230)
 
 base_window.show()
 root.exec()

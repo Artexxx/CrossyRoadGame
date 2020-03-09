@@ -3,6 +3,8 @@ import time
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel
 
+from hero_jump import jump_to_down, jump_to_left, jump_to_right, jump_to_up
+
 T = 0
 V = 10
 A = 2
@@ -19,63 +21,19 @@ def make_hero(window, x, y):
     hero.setFixedSize(100, 100)
     hero.move(x, y)
     hero.direction = Qt.Key_Up
-    hero.timer = "Stop"
+    hero.jump_timer = "Stop"
     hero.setStyleSheet("background-color:  black")
     window.layout().addWidget(hero)
     window.hero = hero
     HeroWindow.hero = hero
 
 
-def jump_to_right(starting_cordinate_hero, hero):
-    global T, V, A
-    start_y = starting_cordinate_hero[0]
-    Y = -V * T + A * T * T / 2
-    hero.move(hero.x() + X_V, start_y + Y)
-    T = T + 1
-    if hero.y() > start_y:
-        hero.move(hero.x(), start_y)
-        T = 0
-        hero.timer = "Stop"
-
-
-def jump_to_left(starting_cordinate_hero, hero):
-    global T, V, A
-    start_y = starting_cordinate_hero[0]
-    Y = -V * T + A * T * T / 2
-    hero.move(hero.x() - X_V, start_y + Y)
-    T = T + 1
-    if hero.y() > start_y:
-        hero.move(hero.x(), start_y)
-        T = 0
-        hero.timer = "Stop"
-
-
-def jump_to_down(starting_cordinate_hero, hero):
-    global T, V, A
-    start_y = starting_cordinate_hero[0]
-    Y = (V - 11) * T + A * T * T / 2
-    hero.move(hero.x(), start_y + Y)
-    T = T + 1
-    if hero.y() > start_y + 100:
-        T = 0
-        hero.timer = "Stop"
-
-
-def jump_to_up(starting_cordinate_hero, hero):
-    global T, V, A
-    start_y = starting_cordinate_hero[0]
-    Y = (-V - 11) * T + A * T * T / 2  # если 10, то недопрыгнит
-    hero.move(hero.x(), start_y + Y)
-    T = T + 1
-    if hero.y() < start_y - 100:
-        T = 0
-        hero.timer = "Stop"
 
 
 def start_jump_hero(hero, function_direction_jump: 'function'):
-    if hero.timer == "Stop":
-        hero.timer = QTimer()
-        timer = window.hero.timer
+    if hero.jump_timer == "Stop":
+        hero.jump_timer = QTimer()
+        timer = window.hero.jump_timer
         starting_cordinate_hero = [window.hero.y(), window.hero.x()]
         timer.timeout.connect(lambda: function_direction_jump(starting_cordinate_hero, hero))
         timer.start(30)
