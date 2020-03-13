@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QPainter, QColor, QPixmap
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QWidget, QMessageBox
 from random import randint
 
 from hero_jump import jump_to_down, jump_to_left, jump_to_right, jump_to_up
@@ -80,22 +80,22 @@ def check_colision_with_tree(window, hero):
 def check_colisions_all(window, key):
     f_hero = Box()
     f_hero.setFixedSize(SHELF_SIZE, SHELF_SIZE)
-    f_hero.x = window.x()
-    f_hero.y = window.y()
+    f_hero.move(window.hero.x(), window.hero.y())
 
     if key == Qt.Key_Left:
-        f_hero.x( -= 25
-        elif key == Qt.Key_Up:
-        f_hero.y += 50
-        elif key == Qt.Key_Right:
-        f_hero.x += 25
-        elif key == Qt.Key_Down:
-        f_hero.y += 50
-    return check_colision_with_tree(window, f_hero) and check_colision_with_car(window, f_hero)
+        f_hero.move(window.hero.x() - 25, window.hero.y())
+    elif key == Qt.Key_Up:
+        f_hero.move(window.hero.x(), window.hero.y() - 50)
+    elif key == Qt.Key_Right:
+        f_hero.move(window.hero.x() + 25, window.hero.y())
+    elif key == Qt.Key_Down:
+        f_hero.move(window.hero.x(), window.hero.y() + 50)
+
+    check_colision_with_car(window, f_hero)
+    return check_colision_with_tree(window, f_hero) or blocking_hero_movement(f_hero)
 
 
-
-# ___________________________________________________________Finish________________________________________
+#  ___________________________________________________________Finish________________________________________
 
 def move_game_window(window1, window2):
     global base_window, window
@@ -126,6 +126,14 @@ def create_window2(base_window):
     base_window.layout().addWidget(window2)
     return window2
 
+
+def restart_game():
+    buttonReply = QMessageBox.question(window, 'PyQt5 message', "Do you like PyQt5?", QMessageBox.Yes | QMessageBox.No,
+                                       QMessageBox.No)
+    if buttonReply == QMessageBox.Yes:
+        print('Yes clicked.')
+    else:
+        print('No clicked.')
 
 def check_finish_line(window):
     global base_window
@@ -168,7 +176,7 @@ def put_a_picture_on_hero(hero, key):
 def blocking_hero_movement(hero):
     x = hero.x()
     y = hero.y()
-    if (x < 0) or (y < 0) or (x >= window.width()) or (y >= window.height()):
+    if (x < 0) or (y < 0) or (x > window.width() - hero.width()) or (y > window.height() - hero.height()):
         return True
 
 
@@ -185,7 +193,7 @@ def move_hero(key):
     global window
     check_finish_line(window)
 
-    if check_colisions_all(window, key):
+    if not (check_colisions_all(window, key)) and window.hero.y() != 0:
 
         if key == Qt.Key_Left:
             start_jump_hero(window.hero, jump_to_left)
@@ -197,32 +205,7 @@ def move_hero(key):
             start_jump_hero(window.hero, jump_to_down)
 
         put_a_picture_on_hero(window.hero, key)
-
-
-def move2_hero(key):
-    global window
-    check_colision_with_car(window)
-    SPEED = int(SHELF_SIZE / 2)
-    x = window.hero.x()
-    y = window.hero.y()
-    hero = window.hero
-    if key == Qt.Key_Left:
-        hero.move(x - SPEED, y)
-    elif key == Qt.Key_Up:
-        hero.move(x, y - SHELF_SIZE)
-    elif key == Qt.Key_Right:
-        hero.move(x + SPEED, y)
-    elif key == Qt.Key_Down:
-        hero.move(x, y + SHELF_SIZE)
-
-    put_a_picture_on_hero(hero, key)
-
-    check_colision_with_car(window)
-    check_finish_line(window)
-    if check_colision_with_tree(window) or blocking_hero_movement(hero):
-        dict_direction = {Qt.Key_Left: Qt.Key_Right, Qt.Key_Down: Qt.Key_Up, Qt.Key_Right: Qt.Key_Left,
-                          Qt.Key_Up: Qt.Key_Down}
-        move_hero(dict_direction[key])
+    check_colision_with_car(window, window.hero)
 
 
 def transportation(car):
