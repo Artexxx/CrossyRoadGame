@@ -47,7 +47,7 @@ window.resize(900, 600)
 # quit.triggered.connect(lambda: make_w())
 
 clock = QtWidgets.QLabel(window)
-clock.setFont(QFont(family="", pointSize=20))
+clock.setFont(QFont("setItalic", 20))
 clock.setText('Label Example')
 bg_new = 'background-color: rgb(%d,%d,%d);' % (random.randint(1, 255), random.randint(1, 255), random.randint(1, 255))
 # clock.text.setStyleSheet(bg_new)
