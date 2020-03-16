@@ -64,6 +64,7 @@ def check_colision_with_car(window, hero):
         if check_colision(hero, car):
             print("HI" * 100)
             car.setStyleSheet("background-color:  red")
+            restart_game()
             return True
         else:
             car.setStyleSheet("background-color:  brown")
@@ -127,13 +128,19 @@ def create_window2(base_window):
     return window2
 
 
-def restart_game():
-    buttonReply = QMessageBox.question(window, 'PyQt5 message', "Do you like PyQt5?", QMessageBox.Yes | QMessageBox.No,
-                                       QMessageBox.No)
-    if buttonReply == QMessageBox.Yes:
-        print('Yes clicked.')
-    else:
-        print('No clicked.')
+def restart_game(): ...
+
+
+# buttonReply = QMessageBox.question(window, 'Вы проиграли.', "Начать игру заново?", QMessageBox.Yes | QMessageBox.Yes,
+#                                   QMessageBox.No)
+# if buttonReply == QMessageBox.Yes:
+#     print('Yes clicked.')
+# else:
+# #     print('No clicked.')
+# ret = QMessageBox.question(window, 'MessageBox', "Click a button", QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel, QMessageBox.Cancel)
+#
+# if ret == QMessageBox.Yes:
+#     print('Button QMessageBox.Yes clicked.')
 
 def check_finish_line(window):
     global base_window
