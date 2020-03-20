@@ -1,5 +1,6 @@
 import random
 
+from PyQt5 import QtWidgets
 from PyQt5.QtGui import QFont
 
 SHELF_SIZE = 50
@@ -9,7 +10,6 @@ A = 1
 X_V = 1
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QApplication, QMainWindow
-from qtpy import QtWidgets
 
 
 def make_w():
@@ -50,7 +50,7 @@ clock = QtWidgets.QLabel(window)
 clock.setFont(QFont("setItalic", 20))
 clock.setText('Label Example')
 bg_new = 'background-color: rgb(%d,%d,%d);' % (random.randint(1, 255), random.randint(1, 255), random.randint(1, 255))
-# clock.text.setStyleSheet(bg_new)
+clock.setStyleSheet(bg_new)
 clock.move(0, 0)
 window.layout().addWidget(clock)
 window.clock = clock
