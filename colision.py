@@ -1,5 +1,7 @@
 from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel
+from hero_jump import jump_to_down, jump_to_left, jump_to_right, jump_to_up
 
 
 class Box(QLabel):
@@ -8,9 +10,12 @@ class Box(QLabel):
 
 def make_monster(window):
     monst = Box()
-    monst.setFixedSize(200, 100)
+    monst.setFixedSize(50, 77)
     monst.move((window.width() - 300) / 2, window.height() / 2)
-    monst.setStyleSheet("background-color:  brown")
+    # monst.setStyleSheet("colorcolorcolor:trunsparent")
+    # monst.setAutoFillBackground(False)
+    monst.setStyleSheet("background-color: rgba(0,0,0,0%)")
+    change_img(monst, TREE_IMG, 2)
     window.layout().addWidget(monst)
     HeroWindow.monst = monst
 
@@ -26,10 +31,6 @@ def check_colision(window):
     y_m = monst.y()
     x1_m = monst.x() + monst.width()
     y1_m = monst.y() + monst.height()
-    if (x1_b > x_m) and (x_b < x1_m) and (y1_b > y_m) and (y_b < y1_m):
-        monst.setStyleSheet("background-color:  red")
-    else:
-        monst.setStyleSheet("background-color:  brown")
 
 
 def check_colision2(window):
@@ -56,10 +57,18 @@ def check_colision2(window):
         monst.setStyleSheet("background-color:  brown")
 
 
+def change_img(obj, ARRAY_OF_IMG, index):
+    pixmap = QPixmap(ARRAY_OF_IMG[index])
+    pixmap = pixmap.scaledToHeight(77)
+    # pixmap = pixmap.scaledToWidth(55)
+    obj.setPixmap(pixmap)
+
+
 def make_button(window, x, y):
     hero = Box()
-    hero.setFixedSize(100, 100)
+    hero.setFixedSize(50, 50)
     hero.move(x, y)
+    hero.jump_timer = "Stop"
     hero.direction = Qt.Key_Up
     hero.setStyleSheet("background-color:  black")
     window.layout().addWidget(hero)
@@ -67,19 +76,26 @@ def make_button(window, x, y):
     HeroWindow.hero = hero
 
 
+def start_jump_hero(hero, function_direction_jump: 'function'):
+    if hero.jump_timer == "Stop":
+        hero.jump_timer = QTimer()
+        timer = window.hero.jump_timer
+        starting_cordinate_hero = [window.hero.y(), window.hero.x()]
+        timer.timeout.connect(lambda: function_direction_jump(starting_cordinate_hero, hero))
+        timer.start(30)
+
 def move_button(window, key):
-    speed = 100
-    x = window.hero.x()
-    y = window.hero.y()
-    hero = window.hero
+    check_colision(window)
+
     if key == Qt.Key_Left:
-        hero.move(x - speed, y)
+        start_jump_hero(window.hero, jump_to_left)
     elif key == Qt.Key_Up:
-        hero.move(x, y - speed)
+        start_jump_hero(window.hero, jump_to_up)
     elif key == Qt.Key_Right:
-        hero.move(x + speed, y)
+        start_jump_hero(window.hero, jump_to_right)
     elif key == Qt.Key_Down:
-        hero.move(x, y + speed)
+        start_jump_hero(window.hero, jump_to_down)
+
     check_colision(window)
 
 
@@ -93,6 +109,9 @@ root = QApplication([])
 window = HeroWindow()
 window.resize(900, 600)
 window.setStyleSheet("background-color:  #FF9E73")
+
+tree_img_names = ['small.png', 'medium.png', 'large.png']
+TREE_IMG = [QPixmap("static/img/tree-" + img_name) for img_name in tree_img_names]
 
 make_button(window, 300, 300)
 make_monster(window)

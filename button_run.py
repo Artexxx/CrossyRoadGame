@@ -60,6 +60,8 @@ def check_colision(hero, car):
 
 
 def check_colision_with_car(window, hero):
+    if window.hero.jump_timer != "Stop":
+        return False
     for car in window.cars:
         if check_colision(hero, car):
             print("HI" * 100)
@@ -161,21 +163,23 @@ def check_finish_line(window):
 
 # ______________________________________________________________________________________________________
 
-def change_img(hero, index):
-    pixmap = QPixmap(HERO_IMG[index])
-    pixmap = pixmap.scaledToHeight(SHELF_SIZE)
-    hero.setPixmap(pixmap)
+def change_img(obj, ARRAY_OF_IMG, index, C):
+    pixmap = QPixmap(ARRAY_OF_IMG[index])
+    pixmap = pixmap.scaledToHeight(C)
+    obj.setPixmap(pixmap)
 
 
 def put_a_picture_on_hero(hero, key):
+    index = 1
     if key == Qt.Key_Left:
-        change_img(hero, 2)
+        index = 2
     elif key == Qt.Key_Up:
-        change_img(hero, 1)
+        index = 1
     elif key == Qt.Key_Down:
-        change_img(hero, 3)
+        index = 3
     elif key == Qt.Key_Right:
-        change_img(hero, 0)
+        index = 0
+    change_img(hero, HERO_IMG, index, SHELF_SIZE)
 
 
 # ______________________________________________________________________________________________________
@@ -212,6 +216,7 @@ def move_hero(key):
             start_jump_hero(window.hero, jump_to_down)
 
         put_a_picture_on_hero(window.hero, key)
+
     check_colision_with_car(window, window.hero)
 
 
@@ -273,9 +278,10 @@ def make_car(position_road, position_car, TYPE_CAR, window):
 
 def make_tree(position_tree, position_forest, window):
     tree = Box()
-    tree.setFixedSize(SHELF_SIZE, SHELF_SIZE)
+    tree.setFixedSize(SHELF_SIZE, 77)
     tree.move(position_tree * SHELF_SIZE, position_forest * SHELF_SIZE)
-    tree.setStyleSheet("background-color:  #502D0C")
+    tree.setStyleSheet("background-color: rgba(0,0,0,0%)")
+    change_img(tree, TREE_IMG, 2, 77)
     window.layout().addWidget(tree)
     window.tree = tree
     window.trees.append(tree)
@@ -303,7 +309,6 @@ def make_road(road_coordinate, window):
 def make_finish_line(window):
     pole = finish()
     pole.setFixedSize(window.width(), SHELF_SIZE)
-
     window.layout().addWidget(pole)
 
 
@@ -346,10 +351,11 @@ window = QMainWindow()
 window.resize(900, 600)
 window.setStyleSheet("background-color:  #FF9E73")
 
-hero_img_names = ['img/sR.png', 'img/sU.png', 'img/sL.png', 'img/sD.png']
-HERO_IMG = []
-for img_name in hero_img_names:
-    HERO_IMG.append(QPixmap(img_name))
+hero_img_names = ['sR.png', 'sU.png', 'sL.png', 'sD.png']
+HERO_IMG = [QPixmap("static/img/" + img_name) for img_name in hero_img_names]
+
+tree_img_names = ['small.png', 'medium.png', 'large.png']
+TREE_IMG = [QPixmap("static/img/tree-" + img_name) for img_name in tree_img_names]
 
 base_window = HeroWindow()
 base_window.resize(900, 600)
