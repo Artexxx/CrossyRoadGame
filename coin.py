@@ -1,7 +1,7 @@
 import random
 
 from PyQt5 import QtWidgets
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont, QPixmap
 
 SHELF_SIZE = 50
 T = 0
