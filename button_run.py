@@ -1,3 +1,5 @@
+import random
+
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QPainter, QColor, QPixmap
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QWidget, QMessageBox
@@ -253,7 +255,7 @@ def make_hero(window, base_window):
     hero.move(int((window.width() - hero.width()) / 2), int((window.height() - hero.height())))
     hero.direction = Qt.Key_Up
     hero.jump_timer = "Stop"
-    hero.setStyleSheet("background-color:  black")
+    hero.setStyleSheet("background-color: rgba(0,0,0,0%)")
     base_window.layout().addWidget(hero)
     window.hero = hero
     base_window.hero = hero
@@ -261,11 +263,12 @@ def make_hero(window, base_window):
 
 def make_car(position_road, position_car, TYPE_CAR, window):
     car = Box()
-    car.setFixedSize(TYPE_CAR["Width"], SHELF_SIZE)
+    car.setFixedSize(90, 50)
     car.move(position_car * SHELF_SIZE, position_road * SHELF_SIZE)
     car.speed = 5
     car.direction = TYPE_CAR["Direction"]
-    car.setStyleSheet("background-color:  brown")
+    car.setStyleSheet("background-color: rgba(0,0,0,0%)")
+    change_img(car, TYPE_CAR["IMG"], random.randint(0, 1), 50)
     window.layout().addWidget(car)
     car.timer = QTimer()
     timer = car.timer
@@ -278,10 +281,10 @@ def make_car(position_road, position_car, TYPE_CAR, window):
 
 def make_tree(position_tree, position_forest, window):
     tree = Box()
-    tree.setFixedSize(SHELF_SIZE, 77)
-    tree.move(position_tree * SHELF_SIZE, position_forest * SHELF_SIZE)
+    tree.setFixedSize(SHELF_SIZE, SHELF_SIZE)
+    tree.move(position_tree * SHELF_SIZE - 23, position_forest * SHELF_SIZE)
     tree.setStyleSheet("background-color: rgba(0,0,0,0%)")
-    change_img(tree, TREE_IMG, 2, 77)
+    change_img(tree, TREE_IMG, 2, SHELF_SIZE)
     window.layout().addWidget(tree)
     window.tree = tree
     window.trees.append(tree)
@@ -328,8 +331,8 @@ def filling_the_window(window):
             make_tree(tree_coordinate, forest_coordinate, window)
 
     # ____________________________________________________________ROAD_________________________________
-    car1 = {"V": 60, "Width": 100, "Direction": Qt.Key_Left, }
-    car2 = {"V": 15, "Width": 50, "Direction": Qt.Key_Right, }
+    car1 = {"V": 60, "IMG": CAR_IMG[::2], "Direction": Qt.Key_Left, }
+    car2 = {"V": 15, "IMG": CAR_IMG[::-2], "Direction": Qt.Key_Right, }
 
     DATA_CARS = {2: [car1, car1, car1, car1], 3: [car2, car2, car2, car2],
                  6: [car1, car1, car1], 7: [car2, car2, car2, car2],
@@ -351,11 +354,14 @@ window = QMainWindow()
 window.resize(900, 600)
 window.setStyleSheet("background-color:  #FF9E73")
 
-hero_img_names = ['sR.png', 'sU.png', 'sL.png', 'sD.png']
+hero_img_names = ['chicken_rd.png', 'chicken_up.png', 'chicken_lf.png', 'chicken_dw.png']
 HERO_IMG = [QPixmap("static/img/" + img_name) for img_name in hero_img_names]
 
 tree_img_names = ['small.png', 'medium.png', 'large.png']
 TREE_IMG = [QPixmap("static/img/tree-" + img_name) for img_name in tree_img_names]
+
+car_img_names = ['p_l.png', 'p_r.png', 'y_l.png', 'y_r.png']
+CAR_IMG = [QPixmap("static/img/car_" + img_name) for img_name in car_img_names]
 
 base_window = HeroWindow()
 base_window.resize(900, 600)

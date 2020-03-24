@@ -5,7 +5,6 @@ from PyQt5 import QtWidgets
 from PyQt5.QtGui import QFont, QPixmap
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QApplication, QMainWindow
-from gpg.gpgme import gpgme_conf_opt
 
 SHELF_SIZE = 50
 T = -5
@@ -42,7 +41,7 @@ def animation_TO_RIGHT(starting_cordinate_hero, hero):
         hero.timer.stop()
         T = -15
 
-        # start_animation(title, window, animation_TO_LEFT)
+        start_animation(title, window, animation_TO_LEFT)
 
 
 def animation_TO_LEFT(starting_cordinate_hero, hero):
@@ -61,7 +60,7 @@ def animation_TO_LEFT(starting_cordinate_hero, hero):
 
 def go_to_CLICK(hand):
     global IMG_HANDS
-    change_img(hand, IMG_HANDS, 0, 60, 60)
+    change_img(hand, IMG_HANDS, 0, 40, 40)
     IMG_HANDS = IMG_HANDS[::-1]
 
 
@@ -79,8 +78,11 @@ change_img(title, IMG_TITLE, 0, 330, 430)
 title.resize(450, 300)
 title.move(window.width() // 2 - title.width() // 2, window.height() // 2 - 272)
 title.move(-123, window.height() // 2 - 272)
+title.LableOpacity(0.2)
 window.layout().addWidget(title)
 window.title = title
+window.setWindowOpacity(0.9)
+
 
 hand = QtWidgets.QLabel(window)
 IMG_HANDS = [QPixmap("static/img/hand0.png"), QPixmap("static/img/hand1.png")]
@@ -88,7 +90,8 @@ bg_new = 'background-color: rgb(%d,%d,%d);' % (random.randint(1, 255), random.ra
 hand.setStyleSheet("background-color: rgba(0,0,0,0%)")
 # hand.setStyleSheet(bg_new)
 hand.resize(100, 90)
-hand.move(window.width() // 2 - hand.width() // 2 + 10, window.height() // 2 + 30)
+
+hand.move(window.width() // 2 - hand.width() // 2 + 10, window.height() // 2 + 150)
 window.layout().addWidget(hand)
 window.hand = hand
 
