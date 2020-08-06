@@ -3,6 +3,11 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel
 from hero_jump import jump_to_down, jump_to_left, jump_to_right, jump_to_up
 
+# from PyQt5.QtCore import Qt, QTimer
+# from PyQt5.QtGui import QPixmap
+# from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel
+# from hero_jump import jump_to_down, jump_to_left, jump_to_right, jump_to_up
+#
 
 class Box(QLabel):
     pass

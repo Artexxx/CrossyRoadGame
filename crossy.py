@@ -16,7 +16,6 @@ class drow(QWidget):
             y += SHELF_SIZE
             painter.drawLine(0, y, w, y)
 
-
 class Box(QLabel):
     pass
 
